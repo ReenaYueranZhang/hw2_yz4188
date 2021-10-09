@@ -9,6 +9,8 @@ output: github_document
 library(tidyverse)
 library(readxl)
 library(dplyr)
+library(ggplot2)
+library(janitor)
 ```
 
 
@@ -110,8 +112,24 @@ The names of key variables: " names(unemployment_data)".
 ## Problem 3
 ```{r}
 babynames_data = read_csv("data/Popular_Baby_Names.csv") 
-  
 babynames_data %>% 
 distinct(.keep_all = TRUE)
+babynames_data = janitor::clean_names(babynames_data)
+select (`Year of Birth`, Gender, Ethnicity, `Child's First Name`, Rank) %>%
+filter(Gender  == "FEMALE",  childs_first_name == "Olivia")
+name
+
+name = read.csv("data/Popular_Baby_Names.csv") %>%
+distinct()%>%
+select(Year.of.Birth, Gender, Ethnicity, Child.s.First.Name, Rank) %>%
+filter(Gender == "MALE", Rank == 1) 
+name
+
+name = read.csv("data/Popular_Baby_Names.csv") %>%
+distinct()%>%
+select(Year.of.Birth, Gender, Ethnicity, Child.s.First.Name, Rank, Count) %>%
+filter(Gender == "MALE", Ethnicity == "WHITE NON HISPANIC", Year.of.Birth == 2016) 
+name
+ggplot(name, aes(x = Count, y = Rank)) + geom_point()
 ```
 
