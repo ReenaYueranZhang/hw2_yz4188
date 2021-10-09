@@ -111,13 +111,12 @@ The names of key variables: " names(unemployment_data)".
 
 ## Problem 3
 ```{r}
-babynames_data = read_csv("data/Popular_Baby_Names.csv") 
-babynames_data %>% 
-distinct(.keep_all = TRUE)
-babynames_data = janitor::clean_names(babynames_data)
-select (`Year of Birth`, Gender, Ethnicity, `Child's First Name`, Rank) %>%
-filter(Gender  == "FEMALE",  childs_first_name == "Olivia")
+name = read.csv("data/Popular_Baby_Names.csv") %>%
+distinct()%>%
+select(Year.of.Birth, Gender, Ethnicity, Child.s.First.Name, Rank) %>%
+filter(Gender == "FEMALE", Child.s.First.Name == "Olivia")
 name
+
 
 name = read.csv("data/Popular_Baby_Names.csv") %>%
 distinct()%>%
