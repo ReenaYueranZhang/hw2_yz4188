@@ -1,0 +1,134 @@
+---
+title: "P8105_hw2"
+author: "yz4188"
+date: 2021-10-08
+output: github_document
+---
+
+```{r setup}
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(janitor)
+```
+
+
+
+### Problem 1
+## Read and clean the Mr. Trash Wheel sheet
+```{r}
+TrashWheel_df = read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+  sheet = "Mr. Trash Wheel", range = cell_cols("A:N")) %>% 
+janitor::clean_names() %>% 
+drop_na(dumpster) %>% 
+mutate(sports_balls = round(sports_balls))
+
+```
+
+## Read and clean precipitation data for 2018 and 2019
+
+```{r Problem 1}
+precipitation2018_df = read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", 
+  sheet = "2018 Precipitation", skip = 1) %>% 
+janitor::clean_names() %>% 
+drop_na(month) %>% 
+mutate(year = 2018, month = month.name) 
+
+precipitation2019_df = read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", 
+  sheet = "2019 Precipitation", skip = 1) %>% 
+janitor::clean_names() %>% 
+drop_na(month) %>% 
+mutate(year = 2019, month = month.name) 
+```
+
+####Conclusions for this problem 1
+For "TrashWheel_df" observations is the "nrow(TrashWheel_df)" 
+For "precipitation2018_df" observations is"nrow(precipitation2018_df)" 
+For "precipitation2019_df" observations is "nrow(precipitation2019_df)" 
+For "total precipitation in 2018" is "sum(pull(precipitation2018_df, total))"  
+For "median number of sports balls in a dumpster in 2019" is "median(pull(TrashWheel_df,sports_balls))"
+
+
+
+### Problem 2
+```{r Problem 2}
+pols_data = read_csv("data/pols-month.csv") %>% 
+separate(col = mon, into = c("year", "month", "day")) %>% 
+mutate(year = as.character(year), 
+       month = as.integer(month),
+       month = month.name[month],
+president = ifelse(prez_dem =="1","dem","gop")) %>% 
+select(-prez_dem, -prez_gop, -day) 
+
+snp_data = read_csv("data/snp.csv") %>% 
+mutate(date = lubridate::mdy(date)) %>%
+separate(col = date, into = c("year", "month", "day")) %>% 
+mutate(year = as.numeric(year),
+       year = ifelse(year > 2021, year - 100, year)) %>% 
+       arrange(year,month) %>% 
+mutate(year = as.character(year),
+       month = as.integer(month),
+       month = month.name[month]) %>%
+select(-day)
+
+unemployment_data = read_csv("data/unemployment.csv") %>% 
+     pivot_longer(Jan:Dec,
+                 names_to = "month",
+                 values_to = "unemployment_percentage") %>%
+    mutate(Year = as.character(Year),
+           month = match(month,month.abb),
+           month = month.name[month]) %>%
+    rename(year = Year) %>%
+    relocate(year, month) %>% 
+    arrange(year,month)
+
+result_data= left_join(left_join(pols_data,snp_data),unemployment_data)
+```
+
+##**pols_data**
+The dimension is "nrow(pols_data)" x " ncol(pols_data)". 
+The range of this data is "min(range(pull(pols_data,year))): max(range(pull(pols_data,year)))". 
+The names of key variables: " names(pols_data)".
+
+##**snp_data**
+
+The dimension is "nrow(snp_data)" "ncol(snp_data)". 
+Then range of this data is "min(range(pull(snp_data ,year))) : max(range(pull(snp_data ,year)))"
+The names of key variables: " names(snp_data)".
+
+**unemployment_data**
+The dimension is "nrow(unemployment_data)" "ncol(unemployment_data)". 
+Then range of this data is "min(range(pull(unemployment_data ,year))) : max(range(pull(unemployment_data ,year)))"
+The names of key variables: " names(unemployment_data)".
+
+**result_data**
+The dimension is "nrow(result_data)" "ncol(result_data)". 
+Then range of this data is "min(range(pull(unemployment_data ,year))) : max(range(pull(unemployment_data ,year)))"
+The names of key variables: " names(unemployment_data)".
+
+
+
+## Problem 3
+```{r}
+name = read.csv("data/Popular_Baby_Names.csv") %>%
+distinct()%>%
+select(Year.of.Birth, Gender, Ethnicity, Child.s.First.Name, Rank) %>%
+filter(Gender == "FEMALE", Child.s.First.Name == "Olivia")
+name
+
+
+name = read.csv("data/Popular_Baby_Names.csv") %>%
+distinct()%>%
+select(Year.of.Birth, Gender, Ethnicity, Child.s.First.Name, Rank) %>%
+filter(Gender == "MALE", Rank == 1) 
+name
+
+name = read.csv("data/Popular_Baby_Names.csv") %>%
+distinct()%>%
+select(Year.of.Birth, Gender, Ethnicity, Child.s.First.Name, Rank, Count) %>%
+filter(Gender == "MALE", Ethnicity == "WHITE NON HISPANIC", Year.of.Birth == 2016) 
+name
+ggplot(name, aes(x = Count, y = Rank)) + geom_point()
+```
+
